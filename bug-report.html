@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Сообщить о баге</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      padding: 24px 16px;
+    }
+    .page {
+      width: min(100%, 720px);
+      margin: 0 auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.10);
+    }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    .lead { margin: 0 0 24px; color: #4b5563; line-height: 1.5; }
+    label {
+      display: block;
+      margin: 18px 0 6px;
+      font-weight: 650;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      background: #fff;
+      color: #111827;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    input:focus, textarea:focus {
+      outline: 3px solid rgba(245,158,11,.25);
+      border-color: #f59e0b;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+    button, .back {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    button { background: #111827; color: white; }
+    button:hover { filter: brightness(1.12); }
+    .back { background: #e5e7eb; color: #111827; }
+    .note {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f9fafb;
+      color: #4b5563;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .required { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <h1>Сообщить о баге</h1>
+      <p class="lead">Опиши проблему как можно подробнее. После нажатия «Отправить» откроется GitHub с уже заполненным обращением.</p>
+
+      <form id="bugForm">
+        <label for="title">Краткое название проблемы <span class="required">*</span></label>
+        <input id="title" name="title" type="text" required maxlength="120" placeholder="Например: не работает кнопка =" />
+
+        <label for="description">Описание ошибки <span class="required">*</span></label>
+        <textarea id="description" name="description" required placeholder="Что произошло?"></textarea>
+
+        <label for="steps">Как повторить ошибку</label>
+        <textarea id="steps" name="steps" placeholder="1. Открыть калькулятор&#10;2. Нажать ...&#10;3. Получить ..."></textarea>
+
+        <label for="expected">Ожидаемый результат</label>
+        <textarea id="expected" name="expected" placeholder="Что должно было произойти?"></textarea>
+
+        <label for="actual">Фактический результат</label>
+        <textarea id="actual" name="actual" placeholder="Что произошло вместо этого?"></textarea>
+
+        <label for="device">Устройство / браузер</label>
+        <input id="device" name="device" type="text" placeholder="Например: Android 14, Chrome" />
+
+        <div class="actions">
+          <button type="submit">Отправить обращение</button>
+          <a class="back" href="index.html">Вернуться к калькулятору</a>
+        </div>
+      </form>
+
+      <div class="note">Для отправки потребуется войти в GitHub. Сам сайт не собирает и не хранит введённые данные.</div>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById('bugForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const title = document.getElementById('title').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const steps = document.getElementById('steps').value.trim();
+      const expected = document.getElementById('expected').value.trim();
+      const actual = document.getElementById('actual').value.trim();
+      const device = document.getElementById('device').value.trim();
+
+      const body = [
+        '## Описание ошибки',
+        description || '—',
+        '',
+        '## Как повторить',
+        steps || '—',
+        '',
+        '## Ожидаемый результат',
+        expected || '—',
+        '',
+        '## Фактический результат',
+        actual || '—',
+        '',
+        '## Устройство / браузер',
+        device || navigator.userAgent,
+        '',
+        '---',
+        'Отправлено со страницы формы сообщения о баге.'
+      ].join('\n');
+
+      const url = new URL('https://github.com/Pavel9876543/test/issues/new');
+      url.searchParams.set('title', '[Баг] ' + title);
+      url.searchParams.set('body', body);
+      window.location.href = url.toString();
+    });
+  </script>
+</body>
+</html>
