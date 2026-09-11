@@ -3,196 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Регистрация на учебные курсы" />
   <title>Регистрация на курсы</title>
   <style>
     * { box-sizing: border-box; }
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #64748b;
+      --line: #dbe3ef;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --ok: #166534;
+      --shadow: 0 24px 60px rgba(15, 23, 42, .10);
+    }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      color: #111827;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0, var(--bg) 320px);
+      color: var(--text);
     }
-    .wrap {
-      width: min(100% - 32px, 860px);
+    .page {
+      width: min(100% - 32px, 920px);
       margin: 0 auto;
-      padding: 40px 0;
+      padding: 56px 0;
     }
     .hero {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
-    .hero h1 {
-      margin: 0 0 10px;
-      font-size: clamp(30px, 6vw, 48px);
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1e40af;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 7vw, 56px);
+      letter-spacing: -.035em;
+      line-height: 1.04;
     }
     .hero p {
-      margin: 0 auto;
       max-width: 680px;
-      color: #4b5563;
-      line-height: 1.6;
+      margin: 16px auto 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 17px;
     }
     .card {
-      background: #fff;
+      background: var(--card);
+      border: 1px solid rgba(219, 227, 239, .9);
       border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 18px 50px rgba(0,0,0,.08);
+      padding: 30px;
+      box-shadow: var(--shadow);
     }
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      gap: 18px;
     }
     .full { grid-column: 1 / -1; }
     label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: 650;
+      margin: 0 0 7px;
+      font-weight: 700;
+      font-size: 15px;
     }
     input, select, textarea {
       width: 100%;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font: inherit;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 13px 14px;
       background: #fff;
-      color: #111827;
+      color: var(--text);
+      font: inherit;
+      transition: border-color .15s ease, box-shadow .15s ease;
     }
     textarea { min-height: 120px; resize: vertical; }
     input:focus, select:focus, textarea:focus {
-      outline: 3px solid rgba(37,99,235,.16);
-      border-color: #2563eb;
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+    }
+    .hint {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
     }
     .check {
       display: flex;
       gap: 10px;
       align-items: flex-start;
-      margin-top: 4px;
+      padding: 14px;
+      border-radius: 13px;
+      background: #f8fafc;
     }
     .check input {
       width: auto;
-      margin-top: 4px;
+      margin-top: 3px;
+      accent-color: var(--accent);
+    }
+    .check label {
+      margin: 0;
+      font-weight: 500;
+      line-height: 1.5;
     }
     .actions {
       display: flex;
       gap: 12px;
+      align-items: center;
       flex-wrap: wrap;
-      margin-top: 22px;
+      margin-top: 24px;
     }
     button {
       border: 0;
-      border-radius: 12px;
-      padding: 13px 18px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      background: #2563eb;
+      border-radius: 13px;
+      padding: 14px 20px;
+      background: var(--accent);
       color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .08s ease, background .15s ease;
     }
-    button:hover { filter: brightness(1.05); }
-    .secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-    .notice {
-      margin-top: 18px;
-      padding: 14px 16px;
-      border-radius: 12px;
-      background: #eff6ff;
-      color: #1e3a8a;
+    button:hover { background: var(--accent-dark); }
+    button:active { transform: translateY(1px); }
+    .privacy {
+      color: var(--muted);
+      font-size: 13px;
       line-height: 1.5;
-      font-size: 14px;
+      flex: 1;
+      min-width: 220px;
     }
-    .status {
-      margin-top: 16px;
-      min-height: 24px;
-      font-weight: 650;
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 18px;
     }
-    @media (max-width: 640px) {
+    .bot-field { display: none !important; }
+    @media (max-width: 680px) {
+      .page { padding: 34px 0; }
+      .card { padding: 20px; border-radius: 18px; }
       .grid { grid-template-columns: 1fr; }
       .full { grid-column: auto; }
-      .card { padding: 18px; border-radius: 18px; }
+      .actions button { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
+  <main class="page">
     <section class="hero">
+      <span class="badge">Онлайн-заявка</span>
       <h1>Регистрация на курсы</h1>
-      <p>Заполните форму, чтобы подготовить заявку на обучение. После подключения способа отправки администратор сможет получать заявки напрямую.</p>
+      <p>Заполните короткую форму. Администратор получит заявку и свяжется с вами для подтверждения записи и уточнения деталей обучения.</p>
     </section>
 
     <section class="card">
-      <form id="registrationForm">
-        <div class="grid">
-          <div>
-            <label for="name">Имя и фамилия *</label>
-            <input id="name" name="name" type="text" required autocomplete="name" placeholder="Иван Иванов" />
-          </div>
+      <form name="course-registration" method="POST" action="/courses/success.html" data-netlify="true" netlify-honeypot="company">
+        <input type="hidden" name="form-name" value="course-registration" />
 
-          <div>
-            <label for="age">Возраст</label>
-            <input id="age" name="age" type="number" min="6" max="100" inputmode="numeric" placeholder="18" />
+        <p class="bot-field" aria-hidden="true">
+          <label>Не заполняйте это поле: <input name="company" tabindex="-1" autocomplete="off" /></label>
+        </p>
+
+        <div class="grid">
+          <div class="full">
+            <label for="name">Имя и фамилия *</label>
+            <input id="name" name="name" type="text" autocomplete="name" minlength="2" maxlength="100" required placeholder="Иван Иванов" />
           </div>
 
           <div>
             <label for="phone">Телефон *</label>
-            <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="+7 900 000-00-00" />
+            <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40" required placeholder="+7 900 000-00-00" />
+            <div class="hint">Укажите номер, по которому с вами можно связаться.</div>
           </div>
 
           <div>
             <label for="email">Email</label>
-            <input id="email" name="email" type="email" autocomplete="email" placeholder="name@example.com" />
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="name@example.com" />
           </div>
 
-          <div class="full">
+          <div>
             <label for="course">Курс *</label>
             <select id="course" name="course" required>
               <option value="">Выберите курс</option>
-              <option>Основной курс</option>
-              <option>Начальный уровень</option>
-              <option>Продвинутый уровень</option>
-              <option>Индивидуальные занятия</option>
+              <option value="Начальный уровень">Начальный уровень</option>
+              <option value="Основной курс">Основной курс</option>
+              <option value="Продвинутый уровень">Продвинутый уровень</option>
+              <option value="Индивидуальные занятия">Индивидуальные занятия</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="contact">Предпочтительный способ связи</label>
+            <select id="contact" name="preferred_contact">
+              <option value="Телефон">Телефон</option>
+              <option value="Email">Email</option>
+              <option value="Любой">Любой</option>
             </select>
           </div>
 
           <div class="full">
             <label for="comment">Комментарий</label>
-            <textarea id="comment" name="comment" placeholder="Удобное время, вопросы или пожелания"></textarea>
+            <textarea id="comment" name="comment" maxlength="1000" placeholder="Например: удобное время для звонка или вопросы по курсу"></textarea>
           </div>
 
           <div class="full check">
-            <input id="consent" name="consent" type="checkbox" required />
-            <label for="consent">Я согласен(на) на обработку указанных данных для связи по поводу записи на курс *</label>
+            <input id="consent" name="consent" type="checkbox" value="Да" required />
+            <label for="consent">Я согласен(на) на использование указанных данных только для обработки заявки и связи по поводу обучения. *</label>
           </div>
         </div>
 
         <div class="actions">
-          <button type="submit">Подготовить заявку</button>
-          <button class="secondary" type="reset">Очистить</button>
+          <button type="submit">Отправить заявку</button>
+          <div class="privacy">Поля со звёздочкой обязательны. Не указывайте в комментарии пароли, банковские данные или другую конфиденциальную информацию.</div>
         </div>
-
-        <div id="status" class="status" aria-live="polite"></div>
       </form>
-
-      <div class="notice">
-        Сейчас форма работает как безопасный макет: данные никуда не отправляются и не сохраняются. Это сделано специально, чтобы не публиковать персональные данные в открытом GitHub. Для настоящей регистрации нужно подключить закрытый канал отправки: например, Telegram, email или базу данных.
-      </div>
     </section>
+
+    <div class="footer">Заявка не считается подтверждённой, пока администратор не свяжется с вами.</div>
   </main>
-
-  <script>
-    const form = document.getElementById('registrationForm');
-    const status = document.getElementById('status');
-
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      if (!form.reportValidity()) return;
-      status.textContent = 'Форма заполнена корректно. Отправка администратору ещё не подключена.';
-    });
-
-    form.addEventListener('reset', () => {
-      status.textContent = '';
-    });
-  </script>
 </body>
 </html>
