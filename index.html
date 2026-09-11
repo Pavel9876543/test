@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      padding: 20px;
+    }
+    .calculator {
+      width: min(100%, 360px);
+      background: #111827;
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.18);
+    }
+    .display {
+      min-height: 96px;
+      display: flex;
+      align-items: end;
+      justify-content: end;
+      padding: 18px 10px;
+      color: white;
+      font-size: 42px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+      text-align: right;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      border: 0;
+      border-radius: 16px;
+      min-height: 64px;
+      font-size: 24px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #374151;
+      color: white;
+      transition: transform .08s ease, filter .08s ease;
+    }
+    button:active { transform: scale(.96); }
+    button:hover { filter: brightness(1.1); }
+    .operator { background: #f59e0b; }
+    .secondary { background: #6b7280; }
+    .equals { background: #10b981; }
+    .zero { grid-column: span 2; }
+  </style>
+</head>
+<body>
+  <main class="calculator" aria-label="Калькулятор">
+    <div id="display" class="display" aria-live="polite">0</div>
+    <div class="buttons">
+      <button class="secondary" data-action="clear">AC</button>
+      <button class="secondary" data-action="sign">±</button>
+      <button class="secondary" data-action="percent">%</button>
+      <button class="operator" data-op="/">÷</button>
+
+      <button data-num="7">7</button>
+      <button data-num="8">8</button>
+      <button data-num="9">9</button>
+      <button class="operator" data-op="*">×</button>
+
+      <button data-num="4">4</button>
+      <button data-num="5">5</button>
+      <button data-num="6">6</button>
+      <button class="operator" data-op="-">−</button>
+
+      <button data-num="1">1</button>
+      <button data-num="2">2</button>
+      <button data-num="3">3</button>
+      <button class="operator" data-op="+">+</button>
+
+      <button class="zero" data-num="0">0</button>
+      <button data-num=".">,</button>
+      <button class="equals" data-action="equals">=</button>
+    </div>
+  </main>
+
+  <script>
+    const display = document.getElementById('display');
+    let current = '0';
+    let previous = null;
+    let operator = null;
+    let waitingForOperand = false;
+
+    function render() {
+      display.textContent = current.replace('.', ',');
+    }
+
+    function inputNumber(value) {
+      if (waitingForOperand) {
+        current = value === '.' ? '0.' : value;
+        waitingForOperand = false;
+        return render();
+      }
+      if (value === '.' && current.includes('.')) return;
+      current = value === '.' ? current + '.' : (current === '0' ? value : current + value);
+      render();
+    }
+
+    function calculate(a, b, op) {
+      if (op === '+') return a + b;
+      if (op === '-') return a - b;
+      if (op === '*') return a * b;
+      if (op === '/') return b === 0 ? NaN : a / b;
+      return b;
+    }
+
+    function chooseOperator(nextOperator) {
+      const value = Number(current);
+      if (operator && previous !== null && !waitingForOperand) {
+        const result = calculate(previous, value, operator);
+        current = Number.isFinite(result) ? String(Number(result.toPrecision(12))) : 'Ошибка';
+        previous = Number.isFinite(result) ? result : null;
+        render();
+      } else {
+        previous = value;
+      }
+      operator = nextOperator;
+      waitingForOperand = true;
+    }
+
+    function equals() {
+      if (operator === null || previous === null || current === 'Ошибка') return;
+      const result = calculate(previous, Number(current), operator);
+      current = Number.isFinite(result) ? String(Number(result.toPrecision(12))) : 'Ошибка';
+      previous = null;
+      operator = null;
+      waitingForOperand = true;
+      render();
+    }
+
+    function clearAll() {
+      current = '0'; previous = null; operator = null; waitingForOperand = false; render();
+    }
+
+    document.querySelector('.buttons').addEventListener('click', e => {
+      const button = e.target.closest('button');
+      if (!button) return;
+      if (button.dataset.num !== undefined) inputNumber(button.dataset.num);
+      else if (button.dataset.op) chooseOperator(button.dataset.op);
+      else if (button.dataset.action === 'equals') equals();
+      else if (button.dataset.action === 'clear') clearAll();
+      else if (button.dataset.action === 'sign' && current !== 'Ошибка') {
+        current = String(Number(current) * -1); render();
+      } else if (button.dataset.action === 'percent' && current !== 'Ошибка') {
+        current = String(Number(current) / 100); render();
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (/^[0-9.]$/.test(e.key)) inputNumber(e.key);
+      else if (['+','-','*','/'].includes(e.key)) chooseOperator(e.key);
+      else if (e.key === 'Enter' || e.key === '=') equals();
+      else if (e.key === 'Escape' || e.key === 'Delete') clearAll();
+    });
+  </script>
+</body>
+</html>
