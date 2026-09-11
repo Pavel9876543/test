@@ -15,8 +15,9 @@
       background: #f3f4f6;
       padding: 20px;
     }
+    .wrap { width: min(100%, 360px); }
     .calculator {
-      width: min(100%, 360px);
+      width: 100%;
       background: #111827;
       border-radius: 24px;
       padding: 18px;
@@ -56,37 +57,50 @@
     .secondary { background: #6b7280; }
     .equals { background: #10b981; }
     .zero { grid-column: span 2; }
+    .bug-link {
+      display: block;
+      margin-top: 14px;
+      text-align: center;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .bug-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <main class="calculator" aria-label="Калькулятор">
-    <div id="display" class="display" aria-live="polite">0</div>
-    <div class="buttons">
-      <button class="secondary" data-action="clear">AC</button>
-      <button class="secondary" data-action="sign">±</button>
-      <button class="secondary" data-action="percent">%</button>
-      <button class="operator" data-op="/">÷</button>
+  <div class="wrap">
+    <main class="calculator" aria-label="Калькулятор">
+      <div id="display" class="display" aria-live="polite">0</div>
+      <div class="buttons">
+        <button class="secondary" data-action="clear">AC</button>
+        <button class="secondary" data-action="sign">±</button>
+        <button class="secondary" data-action="percent">%</button>
+        <button class="operator" data-op="/">÷</button>
 
-      <button data-num="7">7</button>
-      <button data-num="8">8</button>
-      <button data-num="9">9</button>
-      <button class="operator" data-op="*">×</button>
+        <button data-num="7">7</button>
+        <button data-num="8">8</button>
+        <button data-num="9">9</button>
+        <button class="operator" data-op="*">×</button>
 
-      <button data-num="4">4</button>
-      <button data-num="5">5</button>
-      <button data-num="6">6</button>
-      <button class="operator" data-op="-">−</button>
+        <button data-num="4">4</button>
+        <button data-num="5">5</button>
+        <button data-num="6">6</button>
+        <button class="operator" data-op="-">−</button>
 
-      <button data-num="1">1</button>
-      <button data-num="2">2</button>
-      <button data-num="3">3</button>
-      <button class="operator" data-op="+">+</button>
+        <button data-num="1">1</button>
+        <button data-num="2">2</button>
+        <button data-num="3">3</button>
+        <button class="operator" data-op="+">+</button>
 
-      <button class="zero" data-num="0">0</button>
-      <button data-num=".">,</button>
-      <button class="equals" data-action="equals">=</button>
-    </div>
-  </main>
+        <button class="zero" data-num="0">0</button>
+        <button data-num=".">,</button>
+        <button class="equals" data-action="equals">=</button>
+      </div>
+    </main>
+    <a class="bug-link" href="bug-report.html">Сообщить о баге</a>
+  </div>
 
   <script>
     const display = document.getElementById('display');
