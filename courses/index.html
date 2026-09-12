@@ -15,6 +15,7 @@
       --line: #dbe3ef;
       --accent: #2563eb;
       --accent-dark: #1d4ed8;
+      --danger: #b91c1c;
       --ok: #166534;
       --shadow: 0 24px 60px rgba(15, 23, 42, .10);
     }
@@ -30,10 +31,7 @@
       margin: 0 auto;
       padding: 56px 0;
     }
-    .hero {
-      text-align: center;
-      margin-bottom: 28px;
-    }
+    .hero { text-align: center; margin-bottom: 28px; }
     .badge {
       display: inline-block;
       padding: 7px 12px;
@@ -70,12 +68,7 @@
       gap: 18px;
     }
     .full { grid-column: 1 / -1; }
-    label {
-      display: block;
-      margin: 0 0 7px;
-      font-weight: 700;
-      font-size: 15px;
-    }
+    label { display: block; margin: 0 0 7px; font-weight: 700; font-size: 15px; }
     input, select, textarea {
       width: 100%;
       border: 1px solid var(--line);
@@ -92,11 +85,7 @@
       border-color: var(--accent);
       box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
     }
-    .hint {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
+    .hint { margin-top: 6px; color: var(--muted); font-size: 13px; }
     .check {
       display: flex;
       gap: 10px;
@@ -105,16 +94,8 @@
       border-radius: 13px;
       background: #f8fafc;
     }
-    .check input {
-      width: auto;
-      margin-top: 3px;
-      accent-color: var(--accent);
-    }
-    .check label {
-      margin: 0;
-      font-weight: 500;
-      line-height: 1.5;
-    }
+    .check input { width: auto; margin-top: 3px; accent-color: var(--accent); }
+    .check label { margin: 0; font-weight: 500; line-height: 1.5; }
     .actions {
       display: flex;
       gap: 12px;
@@ -135,6 +116,7 @@
     }
     button:hover { background: var(--accent-dark); }
     button:active { transform: translateY(1px); }
+    button:disabled { opacity: .65; cursor: wait; }
     .privacy {
       color: var(--muted);
       font-size: 13px;
@@ -142,12 +124,17 @@
       flex: 1;
       min-width: 220px;
     }
-    .footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 18px;
+    .status {
+      display: none;
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.45;
     }
+    .status.error { display: block; background: #fef2f2; color: var(--danger); }
+    .status.ok { display: block; background: #f0fdf4; color: var(--ok); }
+    .footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 18px; }
     .bot-field { display: none !important; }
     @media (max-width: 680px) {
       .page { padding: 34px 0; }
@@ -163,13 +150,11 @@
     <section class="hero">
       <span class="badge">Онлайн-заявка</span>
       <h1>Регистрация на курсы</h1>
-      <p>Заполните короткую форму. Администратор получит заявку и свяжется с вами для подтверждения записи и уточнения деталей обучения.</p>
+      <p>Заполните короткую форму. После отправки администратор получит данные заявки в Telegram.</p>
     </section>
 
     <section class="card">
-      <form name="course-registration" method="POST" action="/courses/success.html" data-netlify="true" netlify-honeypot="company">
-        <input type="hidden" name="form-name" value="course-registration" />
-
+      <form id="registration-form" novalidate>
         <p class="bot-field" aria-hidden="true">
           <label>Не заполняйте это поле: <input name="company" tabindex="-1" autocomplete="off" /></label>
         </p>
@@ -217,20 +202,67 @@
           </div>
 
           <div class="full check">
-            <input id="consent" name="consent" type="checkbox" value="Да" required />
+            <input id="consent" name="consent" type="checkbox" required />
             <label for="consent">Я согласен(на) на использование указанных данных только для обработки заявки и связи по поводу обучения. *</label>
           </div>
         </div>
 
         <div class="actions">
-          <button type="submit">Отправить заявку</button>
+          <button id="submit-button" type="submit">Отправить заявку</button>
           <div class="privacy">Поля со звёздочкой обязательны. Не указывайте в комментарии пароли, банковские данные или другую конфиденциальную информацию.</div>
         </div>
+        <div id="form-status" class="status" role="status" aria-live="polite"></div>
       </form>
     </section>
 
     <div class="footer">Заявка не считается подтверждённой, пока администратор не свяжется с вами.</div>
   </main>
-  <!-- netlify redeploy trigger: forms enabled -->
+
+  <script>
+    const ENDPOINT = 'https://course-registration-pavel.netlify.app/api/course-registration';
+    const form = document.getElementById('registration-form');
+    const button = document.getElementById('submit-button');
+    const statusBox = document.getElementById('form-status');
+
+    function setStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = 'status ' + type;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      statusBox.className = 'status';
+
+      if (!form.reportValidity()) return;
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.consent = document.getElementById('consent').checked;
+
+      button.disabled = true;
+      button.textContent = 'Отправка…';
+
+      try {
+        const response = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || 'Не удалось отправить заявку');
+        }
+
+        form.reset();
+        setStatus('Заявка успешно отправлена администратору.', 'ok');
+        setTimeout(() => { window.location.href = 'success.html'; }, 700);
+      } catch (error) {
+        setStatus(error.message || 'Произошла ошибка при отправке. Попробуйте ещё раз.', 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Отправить заявку';
+      }
+    });
+  </script>
 </body>
 </html>
